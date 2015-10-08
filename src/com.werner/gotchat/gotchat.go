@@ -1,5 +1,9 @@
-package com.werner/gotchat
+package main
 
-function main(){
-	return "";
+import (
+	"fmt"
+)
+
+func main () {
+	fmt.Printf("Hello World")
 }

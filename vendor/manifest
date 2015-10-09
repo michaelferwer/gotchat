@@ -1,0 +1,11 @@
+{
+	"version": 0,
+	"dependencies": [
+		{
+			"importpath": "github.com/apsdehal/go-logger",
+			"repository": "https://github.com/apsdehal/go-logger",
+			"revision": "db2e3f46146a79f6ffeab14d24283777f4d6a42b",
+			"branch": "master"
+		}
+	]
+}

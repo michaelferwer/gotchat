@@ -1,4 +1,4 @@
-# gotchat
+# gotchat [![Build Status](https://travis-ci.org/michaelferwer/gotchat.svg)](https://travis-ci.org/michaelferwer/gotchat)
 Project in GO
 
 README in progress

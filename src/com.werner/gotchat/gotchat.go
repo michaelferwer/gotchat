@@ -7,8 +7,9 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func ping(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Version 1.0.0\n"))
+func version(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Write([]byte("{\"version\": \"1.0.0\"}\n"))
 	return
 }
 
@@ -22,6 +23,7 @@ func getLogger() *logger.Logger {
 
 func main() {
 	router := mux.NewRouter()
-	router.HandleFunc("/", ping).Methods("GET")
+	router.HandleFunc("/", version).Methods("GET")
+	router.HandleFunc("/version", version).Methods("GET")
 	http.ListenAndServe(":8000", router)
 }

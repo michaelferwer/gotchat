@@ -4,17 +4,15 @@ import (
 	"net/http"
 	"os"
 	"github.com/apsdehal/go-logger"
+	"github.com/gorilla/mux"
 )
 
-func handleConnection (w http.ResponseWriter, r *http.Request) {
-	log := getLogger()
-	log.Debug("Connection")
-	w.Header().Set("Content-Type", "plain/text; charset=utf-8")
-	w.Write([]byte("Hello World"))
+func ping(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("Version 1.0.0\n"))
 	return
 }
 
-func getLogger () *logger.Logger{
+func getLogger() *logger.Logger {
 	log, err := logger.New("LOG", 1, os.Stdout)
 	if err != nil {
 		panic(err) // TODO Check for error
@@ -22,7 +20,8 @@ func getLogger () *logger.Logger{
 	return log
 }
 
-func main () {
-	http.HandleFunc("/", handleConnection)
-  http.ListenAndServe(":8080", nil)
+func main() {
+	router := mux.NewRouter()
+	router.HandleFunc("/", ping).Methods("GET")
+	http.ListenAndServe(":8000", router)
 }

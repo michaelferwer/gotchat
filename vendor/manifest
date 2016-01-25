@@ -6,6 +6,18 @@
 			"repository": "https://github.com/apsdehal/go-logger",
 			"revision": "db2e3f46146a79f6ffeab14d24283777f4d6a42b",
 			"branch": "master"
+		},
+		{
+			"importpath": "github.com/gorilla/context",
+			"repository": "https://github.com/gorilla/context",
+			"revision": "1c83b3eabd45b6d76072b66b746c20815fb2872d",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/gorilla/mux",
+			"repository": "https://github.com/gorilla/mux",
+			"revision": "26a6070f849969ba72b72256e9f14cf519751690",
+			"branch": "master"
 		}
 	]
 }

@@ -4,13 +4,11 @@ import (
 	"net/http"
 	"os"
 	"github.com/apsdehal/go-logger"
-	"github.com/gorilla/mux"
+	"github.com/gin-gonic/gin"
 )
 
-func version(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.Write([]byte("{\"version\": \"1.0.0\"}\n"))
-	return
+func version(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{ "version": "1.0.0" })
 }
 
 func getLogger() *logger.Logger {
@@ -22,8 +20,7 @@ func getLogger() *logger.Logger {
 }
 
 func main() {
-	router := mux.NewRouter()
-	router.HandleFunc("/", version).Methods("GET")
-	router.HandleFunc("/version", version).Methods("GET")
-	http.ListenAndServe(":8000", router)
+	router := gin.Default()
+	router.GET("/version", version)
+	router.Run(":8080")
 }

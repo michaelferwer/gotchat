@@ -19,6 +19,12 @@ To use GB, we must execute the following command to set the location of the curr
 export GB_PROJECT_DIR=`pwd`
 ```
 
+### Restore dependencies
+
+```
+gb-vendor restore
+```
+
 ## Frameworks
 
 ### Web Framework

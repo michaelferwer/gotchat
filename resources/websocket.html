@@ -3,11 +3,43 @@
 <head>
   <meta charset="utf-8">
   <title>Titre de la page</title>
-  <script type="">
-    
-  </script>
 </head>
 <body>
+  <button id='open-websocket'>Open WebSocket</button>
+  <button id='send-message'>Send message</button>
+  <button id='close-websocket'>Close WebSocket</button>
+  <script type="application/javascript">
+    var webSocket;
 
+    document.getElementById('open-websocket').onclick = function(event){
+      if (webSocket == null){
+        webSocket = new WebSocket("ws://localhost:8080/ws/echo");
+        console.log("WebSocket initiate",webSocket.readyState);
+        webSocket.onopen = function (event) {
+          console.log("WebSocket opened",webSocket.readyState);
+        };
+        webSocket.onmessage = function (event) {
+          console.log(event.data);
+        }
+        webSocket.onclose = function (event) {
+          console.log("WebSocket closed",webSocket.readyState);
+          webSocket = null;
+        }
+      }
+    }
+
+    document.getElementById('send-message').onclick = function(event){
+      if(webSocket != null && webSocket.readyState == 1){
+        webSocket.send("Here's some text that the server is urgently awaiting!");
+      }
+    }
+
+    document.getElementById('close-websocket').onclick = function(event){
+      if(webSocket != null && webSocket.readyState == 1){
+        webSocket.close();
+        console.log("WebSocket closing",webSocket.readyState);
+      }
+    }
+  </script>
 </body>
 </html>

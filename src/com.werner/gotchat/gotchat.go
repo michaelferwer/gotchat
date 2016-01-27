@@ -9,6 +9,9 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+var connections [10]*websocket.Conn;
+var size int = 0;
+
 func main() {
 	router := gin.Default()
 	router.GET("/version", version)
@@ -25,6 +28,7 @@ func version(c *gin.Context) {
 var wsupgrader = websocket.Upgrader{
     ReadBufferSize:  1024,
     WriteBufferSize: 1024,
+		CheckOrigin: func(r *http.Request) bool { return true },
 }
 
 func echo(w http.ResponseWriter, r *http.Request){
@@ -33,14 +37,23 @@ func echo(w http.ResponseWriter, r *http.Request){
 	        fmt.Printf("Failed to set websocket upgrade: %+v \n", err)
 	        return
 	    }
-
+			connections[size] = conn
+			size ++
 	    for {
 	        t, msg, err := conn.ReadMessage()
 	        if err != nil {
 	            break
 	        }
-	        conn.WriteMessage(t, msg)
+					for i := 0; i < size ; i ++ {
+							connections[i].WriteMessage(t, msg)
+					}
 	    }
+			for i := 0; i < size ; i ++ {
+				if conn == connections[i] {
+					size --
+					connections[i] = nil
+				}
+			}
 }
 
 func getLogger() *logger.Logger {

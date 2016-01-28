@@ -9,51 +9,52 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-var connections [10]*websocket.Conn;
-var size int = 0;
+var connections map[*websocket.Conn]bool;
 
 func main() {
+	connections = make(map[*websocket.Conn]bool)
 	router := gin.Default()
 	router.GET("/version", version)
 	router.GET("/ws/echo", func(c *gin.Context) {
-        echo(c.Writer, c.Request)
-    })
+		echo(c.Writer, c.Request)
+	})
 	router.Run(":8080")
 }
 
 func version(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{ "version": "1.0.0" })
+	c.JSON(http.StatusOK, gin.H{"version": "1.0.0" })
 }
 
 var wsupgrader = websocket.Upgrader{
-    ReadBufferSize:  1024,
-    WriteBufferSize: 1024,
-		CheckOrigin: func(r *http.Request) bool { return true },
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
 }
 
-func echo(w http.ResponseWriter, r *http.Request){
+func echo(w http.ResponseWriter, r *http.Request) {
 	conn, err := wsupgrader.Upgrade(w, r, nil)
-	    if err != nil {
-	        fmt.Printf("Failed to set websocket upgrade: %+v \n", err)
-	        return
-	    }
-			connections[size] = conn
-			size ++
-	    for {
-	        t, msg, err := conn.ReadMessage()
-	        if err != nil {
-	            break
-	        }
-					for i := 0; i < size ; i ++ {
-							connections[i].WriteMessage(t, msg)
-					}
-	    }
-			for i := 0; i < size ; i ++ {
-				if conn == connections[i] {
-					size --
-					connections[i] = nil
-				}
-			}
+	if err != nil {
+		//noinspection GoPlaceholderCount
+		fmt.Printf("Failed to set websocket upgrade: %+v \n", err)
+		return
+	}
+	defer
+	func() {
+		delete(connections, conn)
+		conn.Close()
+	}()
+	connections[conn] = true
+	for {
+		t, msg, err := conn.ReadMessage()
+		if err != nil {
+			break
+		}
+		for key, _ := range connections {
+			key.WriteMessage(t, msg)
+		}
+	}
 }
 
 func getLogger() *logger.Logger {

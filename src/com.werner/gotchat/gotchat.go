@@ -3,16 +3,18 @@ package main
 import (
 	"net/http"
 	"os"
-	"fmt"
+	"log"
 	"com.werner/gotchat/resources"
-	"github.com/apsdehal/go-logger"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 )
 
 var connections map[*websocket.Conn]bool;
 
+var LOGGER *log.Logger;
+
 func main() {
+	LOGGER = log.New(os.Stdout, "INFO: ", log.Ldate | log.Ltime | log.Lshortfile)
 	connections = make(map[*websocket.Conn]bool)
 	router := gin.Default()
 	router.LoadHTMLGlob("resources/*")
@@ -48,7 +50,7 @@ func echo(w http.ResponseWriter, r *http.Request) {
 	conn, err := wsupgrader.Upgrade(w, r, nil)
 	if err != nil {
 		//noinspection GoPlaceholderCount
-		fmt.Printf("Failed to set websocket upgrade: %+v \n", err)
+		LOGGER.Printf("Failed to set websocket upgrade: %+v \n", err)
 		return
 	}
 	defer
@@ -66,12 +68,4 @@ func echo(w http.ResponseWriter, r *http.Request) {
 			key.WriteMessage(t, msg)
 		}
 	}
-}
-
-func getLogger() *logger.Logger {
-	log, err := logger.New("LOG", 1, os.Stdout)
-	if err != nil {
-		panic(err) // TODO Check for error
-	}
-	return log
 }

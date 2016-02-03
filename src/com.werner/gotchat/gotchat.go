@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"os"
 	"fmt"
+	"com.werner/gotchat/resources"
 	"github.com/apsdehal/go-logger"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -14,11 +15,21 @@ var connections map[*websocket.Conn]bool;
 func main() {
 	connections = make(map[*websocket.Conn]bool)
 	router := gin.Default()
+	router.LoadHTMLGlob("resources/*")
+	router.GET("/", renderHTML)
 	router.GET("/version", version)
 	router.GET("/ws/echo", func(c *gin.Context) {
 		echo(c.Writer, c.Request)
 	})
 	router.Run(":8080")
+}
+
+func renderHTML(c *gin.Context) {
+	_, err := resources.Asset("resources/websocket.html")
+	if err != nil {
+		// Asset was not found.
+	}
+	c.HTML(http.StatusOK, "websocket.html", gin.H{})
 }
 
 func version(c *gin.Context) {

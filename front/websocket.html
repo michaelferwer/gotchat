@@ -6,10 +6,10 @@
 </head>
 <body>
   <button id='open-websocket'>Open WebSocket</button>
-  <button id='send-message'>Send message</button>
   <button id='close-websocket'>Close WebSocket</button>
 
   <div id='tchat-box'></div>
+  <input id='tchat-input'/><button id='send-message'>Send</button>
 
   <script type="application/javascript">
     var webSocket;
@@ -36,7 +36,7 @@
 
     document.getElementById('send-message').onclick = function(event){
       if(webSocket != null && webSocket.readyState == 1){
-        webSocket.send("Here's some text that the server is urgently awaiting!");
+        webSocket.send(document.getElementById('tchat-input').value);
       }
     };
 

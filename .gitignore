@@ -1,4 +1,5 @@
-vendor/src/
+server/vendor/src/
 .idea/
-pkg/
-bin/
+server/pkg/
+server/bin
+

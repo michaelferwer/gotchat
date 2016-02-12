@@ -4,19 +4,18 @@ import (
   "net/http"
   "os"
   "log"
-  "sync"
   "github.com/gin-gonic/gin"
   "github.com/gorilla/websocket"
 )
 
-var connections map[*websocket.Conn]bool;
-// Used to sync access to map connections
-var mutex = &sync.Mutex{}
+var connections map[*websocket.Conn]bool
+var broadcastChannel chan string
 
 var LOGGER *log.Logger;
 
 func main() {
   LOGGER = log.New(os.Stdout, "INFO: ", log.Ldate | log.Ltime | log.Lshortfile)
+  broadcastChannel = make(chan string)
   connections = make(map[*websocket.Conn]bool)
   router := gin.Default()
   router.GET("/version", version)
@@ -47,23 +46,17 @@ func echo(w http.ResponseWriter, r *http.Request) {
   }
   defer
   func() {
-    mutex.Lock()
     delete(connections, conn)
-    mutex.Unlock()
     conn.Close()
   }()
-  mutex.Lock()
   connections[conn] = true
-  mutex.Unlock()
   for {
     t, msg, err := conn.ReadMessage()
     if err != nil {
       break
     }
-    mutex.Lock()
     for key, _ := range connections {
       key.WriteMessage(t, msg)
     }
-    mutex.Unlock()
   }
 }

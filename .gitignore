@@ -2,3 +2,4 @@ server/vendor/src/
 .idea/
 server/pkg/
 server/bin
+*.iml

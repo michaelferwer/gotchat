@@ -4,19 +4,23 @@ import (
   "net/http"
   "os"
   "log"
+  "com.werner/gotchat/broadcaster"
   "github.com/gin-gonic/gin"
   "github.com/gorilla/websocket"
 )
 
-var connections map[*websocket.Conn]bool
-var broadcastChannel chan string
+var broadcastChannel chan *broadcaster.MessageWrapper
 
 var LOGGER *log.Logger;
 
 func main() {
   LOGGER = log.New(os.Stdout, "INFO: ", log.Ldate | log.Ltime | log.Lshortfile)
-  broadcastChannel = make(chan string)
-  connections = make(map[*websocket.Conn]bool)
+  broadcastChannel = make(chan *broadcaster.MessageWrapper)
+
+  // Make Broadcaster and lunch listening message in goroutine
+  broadcaste := broadcaster.NewBroadCaster(broadcastChannel)
+  go func() { broadcaste.HandleMessages() }()
+
   router := gin.Default()
   router.GET("/version", version)
   router.GET("/ws/echo", func(c *gin.Context) {
@@ -44,19 +48,17 @@ func echo(w http.ResponseWriter, r *http.Request) {
     LOGGER.Printf("Failed to set websocket upgrade: %+v \n", err)
     return
   }
-  defer
-  func() {
-    delete(connections, conn)
+  defer func() {
+    broadcastChannel <- broadcaster.NewMessageWrapper(conn, "", 0, broadcaster.UNSUBSCRIBE)
     conn.Close()
   }()
-  connections[conn] = true
+
+  broadcastChannel <- broadcaster.NewMessageWrapper(conn, "", 0, broadcaster.SUBSCRIBE)
   for {
-    t, msg, err := conn.ReadMessage()
+    msgType, msg, err := conn.ReadMessage()
     if err != nil {
       break
     }
-    for key, _ := range connections {
-      key.WriteMessage(t, msg)
-    }
+    broadcastChannel <- broadcaster.NewMessageWrapper(conn, string(msg), msgType, broadcaster.SEND)
   }
 }

@@ -7,6 +7,6 @@ env: ; @echo "$(OK_COLOR)--SETTING ENVIRONMENT VARIABLES$(NO_COLOR)" ; export GB
 
 dependencies: ; @echo "$(OK_COLOR)--DEPENDENCIES$(NO_COLOR)" ; gb vendor restore
 
-build : ; echo "$(OK_COLOR)--BUILD$(NO_COLOR)" ;  gb build
+build: ; @echo "$(OK_COLOR)--BUILD$(NO_COLOR)" ;  gb build
 
-run: ; echo "$(OK_COLOR)--RUN$(NO_COLOR)" ; ./bin/gotchat
+run: ; @echo "$(OK_COLOR)--RUN$(NO_COLOR)" ; ./bin/gotchat
